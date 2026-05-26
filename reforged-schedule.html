@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reforged">
+<title>Reforged Schedule</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: Georgia, serif;
+    background: #0c0c18;
+    color: #eae8f2;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ── Header ── */
+  #header {
+    padding: 52px 16px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(10,10,20,0.92);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  #mode-label {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    transition: color 0.3s;
+  }
+  #day-title {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  #day-subtitle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.32);
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  /* ── Mode toggle ── */
+  #mode-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 3px;
+    margin-bottom: 12px;
+    width: fit-content;
+  }
+  .mode-btn {
+    padding: 5px 16px;
+    border-radius: 16px;
+    border: none;
+    font-family: Georgia, serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: rgba(255,255,255,0.4);
+  }
+  .mode-btn.active-work {
+    background: rgba(244,162,97,0.2);
+    color: #F4A261;
+  }
+  .mode-btn.active-off {
+    background: rgba(149,213,178,0.18);
+    color: #95D5B2;
+  }
+
+  /* ── Day tabs ── */
+  #day-tabs {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: 12px;
+    scrollbar-width: none;
+  }
+  #day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: transparent;
+    color: rgba(255,255,255,0.35);
+    font-size: 13px;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .day-tab.today-tab { border-color: rgba(244,162,97,0.28); color: rgba(255,255,255,0.6); }
+  .day-tab.active-work { border-color: #F4A261; background: rgba(244,162,97,0.15); color: #F4A261; }
+  .day-tab.active-off  { border-color: #95D5B2; background: rgba(149,213,178,0.12); color: #95D5B2; }
+
+  /* ── Progress ── */
+  #progress-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 5px;
+  }
+  #progress-bar-bg {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.35s ease;
+    background: linear-gradient(90deg, #F4A261, #FF6B6B);
+  }
+
+  /* ── Blocks ── */
+  #blocks { max-width: 640px; margin: 0 auto; padding: 14px 14px 0; }
+
+  .block {
+    margin-bottom: 9px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.025);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .block.complete { }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 13px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .block-icon {
+    width: 32px; height: 32px;
+    border-radius: 7px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .block-info { flex: 1; min-width: 0; }
+  .block-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #eae8f2;
+    transition: color 0.2s;
+    line-height: 1.2;
+  }
+  .block-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.03em;
+    margin-left: 7px;
+  }
+  .block-mini-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+  }
+  .block-mini-bar-bg {
+    height: 2px; width: 60px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 1px; overflow: hidden;
+  }
+  .block-mini-bar { height: 100%; border-radius: 1px; transition: width 0.3s; }
+  .block-count { font-size: 10px; color: rgba(255,255,255,0.28); }
+  .block-chevron {
+    font-size: 13px;
+    color: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .block-chevron.open { transform: rotate(180deg); }
+
+  /* ── Expanded ── */
+  .block-body {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 13px 13px;
+    display: none;
+  }
+  .block-body.open { display: block; }
+  .block-note {
+    font-size: 12px;
+    font-style: italic;
+    margin-bottom: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border-left-width: 3px;
+    border-left-style: solid;
+    line-height: 1.5;
+  }
+
+  /* ── Tasks ── */
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 7px 0;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .task:last-child { border-bottom: none; }
+  .task-check {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    border: 1.5px solid rgba(255,255,255,0.18);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-size: 9px;
+    font-weight: bold;
+    color: #0c0c18;
+  }
+  .task-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.8);
+    transition: color 0.15s;
+  }
+  .task-text.done {
+    color: rgba(255,255,255,0.25);
+    text-decoration: line-through;
+  }
+  .task-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Legend ── */
+  #legend {
+    max-width: 640px;
+    margin: 18px auto 0;
+    padding: 13px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.01);
+  }
+  #legend-title {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    margin-bottom: 9px;
+  }
+  #legend-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .legend-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="mode-label">Reforged · Daily Command Center</div>
+  <div id="day-title"></div>
+  <div id="day-subtitle"></div>
+  <div id="mode-toggle">
+    <button class="mode-btn active-work" onclick="setMode('work')">Work Day</button>
+    <button class="mode-btn" onclick="setMode('off')">Day Off</button>
+  </div>
+  <div id="day-tabs"></div>
+  <div id="progress-row">
+    <span id="progress-text">0 / 0 tasks</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div id="progress-bar-bg"><div id="progress-bar" style="width:0%"></div></div>
+</div>
+
+<div id="blocks"></div>
+<div id="legend">
+  <div id="legend-title">Categories</div>
+  <div id="legend-tags"></div>
+</div>
+
+<script>
+// ─── Colors ────────────────────────────────────────────────────────────────
+const C = {
+  morning:"#F4A261", work:"#8ECAE6", reset:"#95D5B2",
+  wgu:"#E07A8F", nasm:"#C77DFF", workout:"#FF6B6B",
+  run:"#FF9F43", walk:"#81C784", reforged:"#4CC9F0",
+  dinner:"#FFD166", wind:"#6D6875", personal:"#90E0EF",
+  admin:"#E9C46A", ebay:"#86BBD8", house:"#A8C5A0", commute:"#B0B0C0",
+};
+const TAG_C = {
+  Fitness:"#FF6B6B", Nutrition:"#95D5B2", WGU:"#E07A8F",
+  NASM:"#C77DFF", Reforged:"#4CC9F0", Admin:"#E9C46A",
+  Work:"#8ECAE6", Personal:"#90E0EF", Run:"#FF9F43",
+  Walk:"#81C784", eBay:"#86BBD8", Home:"#A8C5A0",
+};
+
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+const DAY_META = {
+  work: {
+    Mon:"Workout · Walk", Tue:"Workout · Run", Wed:"Rest · Walk · Extra Study",
+    Thu:"Workout · Run", Fri:"Workout · Walk", Sat:"Workout · Run · Errands",
+    Sun:"Rest · Walk · Laundry & Yard",
+  },
+  off: {
+    Mon:"Workout · Walk", Tue:"Workout · Run", Wed:"Rest · Walk · Big Study Day",
+    Thu:"Workout · Run", Fri:"Workout · Walk", Sat:"Workout · Run · Errands",
+    Sun:"Rest · Walk · Laundry & Yard",
+  },
+};
+
+// ─── Schedule data ──────────────────────────────────────────────────────────
+const b = (time,label,icon,color,note,tasks) => ({time,label,icon,color,note,tasks});
+const t = (text,tag) => ({text,tag});
+
+// shared task lists
+const morningTasks = [
+  t("CPAP removal & eufy weigh-in","Fitness"),
+  t("Log weight & body comp in MacroFactor","Fitness"),
+  t("16–24 oz water + high-protein breakfast","Nutrition"),
+];
+const workoutTasks = [
+  t("MacroFactor workout — follow current program","Fitness"),
+  t("Log workout in MacroFactor","Fitness"),
+  t("Post-workout protein","Nutrition"),
+];
+const runTasks = [
+  t("Run — 30–35 min","Run"),
+  t("Log in Apple Health / MacroFactor","Fitness"),
+  t("Post-run hydration & refuel","Nutrition"),
+];
+const walkTasks = [
+  t("1 hour walk","Walk"),
+  t("Log steps in Apple Health","Fitness"),
+];
+const ebayTasks = [
+  t("List item 1","eBay"), t("List item 2","eBay"), t("List item 3","eBay"),
+  t("List item 4","eBay"), t("List item 5","eBay"),
+];
+const dinnerTasks = [
+  t("Dinner with family — present, not distracted","Personal"),
+  t("Log dinner in MacroFactor after","Nutrition"),
+];
+const windTasks = [
+  t("Final MacroFactor nutrition log","Nutrition"),
+  t("Review tomorrow's top priority (1 min)","Admin"),
+  t("CPAP setup — consistent bedtime","Fitness"),
+];
+const eveningTasks = [
+  t("Dishes / kitchen cleanup","Home"),
+  t("Trash / small household tasks","Home"),
+  t("Reforged social media or light reading (phone)","Reforged"),
+  t("MacroFactor weekly check-in if due","Fitness"),
+];
+const houseTasks = [
+  t("Tidying / surfaces / clutter","Home"),
+  t("Trash if needed","Home"),
+  t("Spot vacuum or sweep as needed","Home"),
+];
+
+// ── WORK SCHEDULES ──────────────────────────────────────────────────────────
+const WORK = {
+  Mon: [
+    b("6:00 – 6:30 AM","Morning Routine","🌅",C.morning,"Your data is your content — don't skip the scale.",morningTasks),
+    b("6:30 – 6:50 AM","Work Prep & Commute","🚗",C.commute,null,[t("Quick schedule check + grab bag","Admin"),t("10 min commute to work","Work")]),
+    b("7:00 AM – 1:00 PM","Work","💼",C.work,"Full focus. No side-project bleed.",[t("Job focus block — protect this time","Work")]),
+    b("1:00 – 1:10 PM","Commute Home","🚗",C.commute,null,[t("10 min commute home","Work")]),
+    b("1:10 – 1:40 PM","Reset & Lunch","🍽️",C.reset,"Brain shift — work mode to build mode.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
+    b("1:40 – 2:40 PM","WGU Study","📚",C.wgu,"Top priority. PA pending? Drop the prompt in Claude and use body-doubling to start.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("2:40 – 3:10 PM","NASM Study","🧠",C.nasm,"Block 2: Client Relations & Coaching.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("3:10 – 4:40 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program. Training + transformation content.",workoutTasks),
+    b("4:40 – 5:40 PM","Walk (1 hr)","🚶",C.walk,"Active recovery. Good podcast or audiobook time.",walkTasks),
+    b("5:40 – 6:05 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each. Stack the listings.",ebayTasks),
+    b("6:05 – 6:30 PM","Household (daily)","🏠",C.house,"Quick maintenance — keeps the week from piling up.",houseTasks),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time. No phone, no laptop at the table.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone + simple household tasks.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else — protect it.",windTasks),
+  ],
+  Tue: [
+    b("6:00 – 6:30 AM","Morning Routine","🌅",C.morning,"Your data is your content.",morningTasks),
+    b("6:30 – 6:50 AM","Work Prep & Commute","🚗",C.commute,null,[t("Quick schedule check + grab bag","Admin"),t("10 min commute to work","Work")]),
+    b("7:00 AM – 1:00 PM","Work","💼",C.work,"Full focus. No side-project bleed.",[t("Job focus block — protect this time","Work")]),
+    b("1:00 – 1:10 PM","Commute Home","🚗",C.commute,null,[t("10 min commute home","Work")]),
+    b("1:10 – 1:40 PM","Reset & Lunch","🍽️",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
+    b("1:40 – 2:40 PM","WGU Study","📚",C.wgu,"Top priority. PA pending? Use this block.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("2:40 – 3:10 PM","NASM Study","🧠",C.nasm,"Block 2: Client Relations & Coaching.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("3:10 – 4:40 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program.",workoutTasks),
+    b("4:40 – 5:15 PM","Run (30–35 min)","🏃",C.run,"Post-workout run. Consistency here built your 5K.",runTasks),
+    b("5:15 – 5:40 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("5:40 – 6:10 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("6:10 – 6:30 PM","Reforged Business","🏗️",C.reforged,"20 min daily touch — small and consistent.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Wed: [
+    b("6:00 – 6:30 AM","Morning Routine","🌅",C.morning,"Rest day — still the same start.",morningTasks),
+    b("6:30 – 6:50 AM","Work Prep & Commute","🚗",C.commute,null,[t("Quick schedule check + grab bag","Admin"),t("10 min commute to work","Work")]),
+    b("7:00 AM – 1:00 PM","Work","💼",C.work,"Full focus.",[t("Job focus block — protect this time","Work")]),
+    b("1:00 – 1:10 PM","Commute Home","🚗",C.commute,null,[t("10 min commute home","Work")]),
+    b("1:10 – 1:40 PM","Reset & Lunch","🍽️",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
+    b("1:40 – 3:00 PM","WGU Study","📚",C.wgu,"No workout today — full 80 min. Great day to tackle a complete module or PA.",[t("WGU full module or performance assessment","WGU"),t("If PA pending → body-doubling session with Claude","WGU"),t("Review rubric before submitting anything","WGU")]),
+    b("3:00 – 3:45 PM","NASM Study","🧠",C.nasm,"Longer block on rest day — push deeper into Block 2.",[t("Block 2: Client Relations & Coaching","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference — relevant chapter","NASM")]),
+    b("3:45 – 4:45 PM","Walk (1 hr)","🚶",C.walk,"Active recovery. Podcast or audiobook.",walkTasks),
+    b("4:45 – 5:10 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("5:10 – 5:40 PM","Household (mid-week)","🏠",C.house,"Deeper mid-week clean.",[t("Vacuuming — main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces","Home"),t("Trash if needed","Home")]),
+    b("5:40 – 6:30 PM","Reforged Business","🏗️",C.reforged,"Biggest Reforged block of the week — no workout competing.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Thu: [
+    b("6:00 – 6:30 AM","Morning Routine","🌅",C.morning,"Your data is your content.",morningTasks),
+    b("6:30 – 6:50 AM","Work Prep & Commute","🚗",C.commute,null,[t("Quick schedule check + grab bag","Admin"),t("10 min commute to work","Work")]),
+    b("7:00 AM – 1:00 PM","Work","💼",C.work,"Full focus.",[t("Job focus block — protect this time","Work")]),
+    b("1:00 – 1:10 PM","Commute Home","🚗",C.commute,null,[t("10 min commute home","Work")]),
+    b("1:10 – 1:40 PM","Reset & Lunch","🍽️",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
+    b("1:40 – 2:40 PM","WGU Study","📚",C.wgu,"Top priority. PA pending? Use this block.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("2:40 – 3:10 PM","NASM Study","🧠",C.nasm,"Block 2 continues.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("3:10 – 4:40 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program.",workoutTasks),
+    b("4:40 – 5:15 PM","Run (30–35 min)","🏃",C.run,"Post-workout run.",runTasks),
+    b("5:15 – 5:40 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("5:40 – 6:10 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("6:10 – 6:30 PM","Reforged Business","🏗️",C.reforged,"20 min daily touch.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Fri: [
+    b("6:00 – 6:30 AM","Morning Routine","🌅",C.morning,"End of work week — stay consistent.",morningTasks),
+    b("6:30 – 6:50 AM","Work Prep & Commute","🚗",C.commute,null,[t("Quick schedule check + grab bag","Admin"),t("10 min commute to work","Work")]),
+    b("7:00 AM – 1:00 PM","Work","💼",C.work,"Full focus through the finish line.",[t("Job focus block — protect this time","Work")]),
+    b("1:00 – 1:10 PM","Commute Home","🚗",C.commute,null,[t("10 min commute home","Work")]),
+    b("1:10 – 1:40 PM","Reset & Lunch","🍽️",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
+    b("1:40 – 2:40 PM","WGU Study","📚",C.wgu,"End-of-week push — don't let WGU slide into the weekend.",[t("One WGU module or reading","WGU"),t("If PA pending → use this block to finish it","WGU")]),
+    b("2:40 – 3:10 PM","NASM Study","🧠",C.nasm,"Block 2 wrap-up — note anything to revisit this weekend.",[t("Block 2 review or practice questions","NASM"),t("Note areas to revisit over the weekend","NASM")]),
+    b("3:10 – 4:40 PM","Workout (1.5 hrs)","🏋️",C.workout,"Friday workout — strong finish to the training week.",workoutTasks),
+    b("4:40 – 5:40 PM","Walk (1 hr)","🚶",C.walk,"Friday walk — decompression before the weekend.",walkTasks),
+    b("5:40 – 6:05 PM","eBay — List 5 Items","🛒",C.ebay,"End the week with a clean queue.",ebayTasks),
+    b("6:05 – 6:30 PM","Household (daily)","🏠",C.house,"Set yourself up for a clean weekend.",houseTasks),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Start the weekend with family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Friday Evening","📱",C.personal,"Wind down into the weekend.",[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / personal decompression","Personal")]),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Friday sets up a strong Saturday.",windTasks),
+  ],
+  Sat: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Weekend — still hit the scale.",morningTasks),
+    b("8:30 – 10:00 AM","WGU + NASM Study","📚",C.wgu,"Weekend study block. No work pressure — use it well.",[t("WGU module or PA draft","WGU"),t("NASM Block 2 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
+    b("10:00 – 11:30 AM","Workout (1.5 hrs)","🏋️",C.workout,"Saturday workout.",workoutTasks),
+    b("11:30 AM – 12:05 PM","Run (flexible)","🏃",C.run,"Saturday run — flexible, go longer if you want.",runTasks),
+    b("12:05 – 12:30 PM","eBay — List 5 Items","🛒",C.ebay,"Quick listing session before errands.",ebayTasks),
+    b("12:30 – 3:00 PM","Errands & Groceries","🛍️",C.house,"Saturday errand run. Groceries, supplies, anything needed.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+    b("3:00 – 4:00 PM","Reforged Business","🏗️",C.reforged,"Good day for bigger-picture planning or content.",[t("Gym Bible or Roadmap work","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
+    b("4:00 – 6:30 PM","Personal / Family Time","☀️",C.personal,"Protected afternoon before dinner.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Saturday Evening","📱",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Saturday sets up a productive Sunday.",windTasks),
+  ],
+  Sun: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Rest day — still hit the scale.",morningTasks),
+    b("8:30 – 10:30 AM","WGU + NASM Study","📚",C.wgu,"Longest study block of the week — push through a full module.",[t("WGU full module or performance assessment","WGU"),t("NASM Block 2 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
+    b("10:30 – 11:30 AM","Walk (1 hr)","🚶",C.walk,"Sunday walk — mental reset before the week ahead.",walkTasks),
+    b("11:30 AM – 2:00 PM","Laundry + Yardwork","🏡",C.house,"Primary home day. Run laundry while you do the yard.",[t("Start laundry — first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
+    b("2:00 – 2:25 PM","eBay — List 5 Items","🛒",C.ebay,"Weekly listing session.",ebayTasks),
+    b("2:25 – 3:30 PM","Reforged Weekly Review","🏗️",C.reforged,"Set direction for the week.",[t("Weekly review — Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
+    b("3:30 – 6:30 PM","Personal / Family Time","☀️",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Sunday sets the tone for the whole week.",windTasks),
+  ],
+};
+
+// ── DAY OFF SCHEDULES ───────────────────────────────────────────────────────
+const OFF = {
+  Mon: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Consistent start — same routine whether working or not.",morningTasks),
+    b("8:30 – 10:00 AM","WGU Study","📚",C.wgu,"Day off = best study conditions. No post-work fatigue.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("10:00 – 10:45 AM","NASM Study","🧠",C.nasm,"Block 2: Client Relations & Coaching.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("10:45 AM – 12:00 PM","Reforged Business","🏗️",C.reforged,"Gym Bible or Roadmap — one section.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("12:00 – 12:30 PM","Lunch Break","🍽️",C.reset,"Step away from the screen. Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+    b("12:30 – 12:55 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("12:55 – 1:25 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("1:25 – 3:00 PM","Free Time / Personal","🎯",C.personal,"Genuinely off. Rest is part of the plan.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+    b("3:00 – 4:30 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program.",workoutTasks),
+    b("4:30 – 5:30 PM","Walk (1 hr)","🚶",C.walk,"Active recovery.",walkTasks),
+    b("5:30 – 6:30 PM","Extra Reforged / Personal","🏗️",C.reforged,"Day-off bonus block — deeper work or genuine rest.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest — this is your day off","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Tue: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Consistent start.",morningTasks),
+    b("8:30 – 10:00 AM","WGU Study","📚",C.wgu,"Day off = best study conditions.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("10:00 – 10:45 AM","NASM Study","🧠",C.nasm,"Block 2: Client Relations & Coaching.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("10:45 AM – 12:00 PM","Reforged Business","🏗️",C.reforged,"Gym Bible or Roadmap — one section.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("12:00 – 12:30 PM","Lunch Break","🍽️",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+    b("12:30 – 12:55 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("12:55 – 1:25 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("1:25 – 3:00 PM","Free Time / Personal","🎯",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+    b("3:00 – 4:30 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program.",workoutTasks),
+    b("4:30 – 5:05 PM","Run (30–35 min)","🏃",C.run,"Post-workout run.",runTasks),
+    b("5:05 – 6:30 PM","Extra Reforged / Personal","🏗️",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest — this is your day off","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Wed: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Rest day — same start, same scale.",morningTasks),
+    b("8:30 – 10:30 AM","WGU Study","📚",C.wgu,"Rest day + day off = no excuses. Full 2 hours. Best day to finish a module or knock out a PA.",[t("WGU full module or performance assessment","WGU"),t("If PA pending → body-doubling session with Claude","WGU"),t("Review rubric before submitting","WGU")]),
+    b("10:30 – 11:30 AM","NASM Study","🧠",C.nasm,"Biggest NASM block of the week. Push deep into Block 2.",[t("Block 2: Client Relations & Coaching","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference — relevant chapter","NASM")]),
+    b("11:30 AM – 12:30 PM","Walk (1 hr)","🚶",C.walk,"Mid-morning walk — good mental break between study and the rest of the day.",walkTasks),
+    b("12:30 – 1:00 PM","Lunch Break","🍽️",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+    b("1:00 – 2:30 PM","Reforged Business","🏗️",C.reforged,"90 min — biggest Reforged block of the week.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("2:30 – 2:55 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("2:55 – 3:30 PM","Household (rest day)","🏠",C.house,"Deeper mid-week clean.",[t("Vacuuming — main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces / clutter","Home"),t("Trash if needed","Home")]),
+    b("3:30 – 6:30 PM","Free Time / Personal","🎯",C.personal,"Long rest afternoon — earned it.",[t("Rest, hobby, or anything you want","Personal"),t("Family time","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Thu: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Consistent start.",morningTasks),
+    b("8:30 – 10:00 AM","WGU Study","📚",C.wgu,"Day off = best study conditions.",[t("One WGU module or reading","WGU"),t("If PA pending → open Claude, drop prompt, start writing","WGU")]),
+    b("10:00 – 10:45 AM","NASM Study","🧠",C.nasm,"Block 2 continues.",[t("Block 2: Client Relations & Coaching","NASM"),t("Flashcard review or practice questions","NASM")]),
+    b("10:45 AM – 12:00 PM","Reforged Business","🏗️",C.reforged,"Gym Bible or Roadmap — one section.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("12:00 – 12:30 PM","Lunch Break","🍽️",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+    b("12:30 – 12:55 PM","eBay — List 5 Items","🛒",C.ebay,"5 items × ~5 min each.",ebayTasks),
+    b("12:55 – 1:25 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("1:25 – 3:00 PM","Free Time / Personal","🎯",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+    b("3:00 – 4:30 PM","Workout (1.5 hrs)","🏋️",C.workout,"MacroFactor program.",workoutTasks),
+    b("4:30 – 5:05 PM","Run (30–35 min)","🏃",C.run,"Post-workout run.",runTasks),
+    b("5:05 – 6:30 PM","Extra Reforged / Personal","🏗️",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest — this is your day off","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Sleep quality drives everything else.",windTasks),
+  ],
+  Fri: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Consistent start.",morningTasks),
+    b("8:30 – 10:00 AM","WGU Study","📚",C.wgu,"End of the week — cap it off strong.",[t("One WGU module or reading","WGU"),t("If PA pending → use this block to finish it","WGU")]),
+    b("10:00 – 10:45 AM","NASM Study","🧠",C.nasm,"Block 2 review — note anything to revisit this weekend.",[t("Block 2 review or practice questions","NASM"),t("Note areas to revisit over the weekend","NASM")]),
+    b("10:45 AM – 12:00 PM","Reforged Business","🏗️",C.reforged,"Gym Bible or Roadmap — one section.",[t("Gym Bible or Roadmap — one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")]),
+    b("12:00 – 12:30 PM","Lunch Break","🍽️",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+    b("12:30 – 12:55 PM","eBay — List 5 Items","🛒",C.ebay,"End the week with a clean queue.",ebayTasks),
+    b("12:55 – 1:25 PM","Household (daily)","🏠",C.house,"Quick maintenance.",houseTasks),
+    b("1:25 – 3:00 PM","Free Time / Personal","🎯",C.personal,"Genuinely off — start the weekend early.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+    b("3:00 – 4:30 PM","Workout (1.5 hrs)","🏋️",C.workout,"Friday workout — strong close to the training week.",workoutTasks),
+    b("4:30 – 5:30 PM","Walk (1 hr)","🚶",C.walk,"Friday walk — decompress into the weekend.",walkTasks),
+    b("5:30 – 6:30 PM","Personal / Family","☀️",C.personal,"Start the weekend early.",[t("Family time or personal rest","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Friday Evening","📱",C.personal,"Lighter Friday evening.",[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / personal decompression","Personal")]),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Friday sets up a strong Saturday.",windTasks),
+  ],
+  Sat: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Weekend — still hit the scale.",morningTasks),
+    b("8:30 – 10:00 AM","WGU + NASM Study","📚",C.wgu,"Weekend study block. No pressure — use it well.",[t("WGU module or PA draft","WGU"),t("NASM Block 2 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
+    b("10:00 – 11:30 AM","Workout (1.5 hrs)","🏋️",C.workout,"Saturday workout.",workoutTasks),
+    b("11:30 AM – 12:05 PM","Run (flexible)","🏃",C.run,"Saturday run — flexible, go longer if you want.",runTasks),
+    b("12:05 – 12:30 PM","eBay — List 5 Items","🛒",C.ebay,"Quick listing session before errands.",ebayTasks),
+    b("12:30 – 3:00 PM","Errands & Groceries","🛍️",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+    b("3:00 – 4:00 PM","Reforged Business","🏗️",C.reforged,"Good day for bigger-picture planning.",[t("Gym Bible or Roadmap work","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
+    b("4:00 – 6:30 PM","Personal / Family Time","☀️",C.personal,"Protected afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Saturday Evening","📱",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Saturday sets up a productive Sunday.",windTasks),
+  ],
+  Sun: [
+    b("8:00 – 8:30 AM","Morning Routine","🌅",C.morning,"Rest day — still hit the scale.",morningTasks),
+    b("8:30 – 10:30 AM","WGU + NASM Study","📚",C.wgu,"Longest study block of the week — push through a full module.",[t("WGU full module or performance assessment","WGU"),t("NASM Block 2 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
+    b("10:30 – 11:15 AM","Walk (1 hr)","🚶",C.walk,"Sunday walk — mental reset before the week ahead.",walkTasks),
+    b("11:15 AM – 2:30 PM","Laundry + Yardwork","🏡",C.house,"Primary home day. Laundry runs while you do the yard.",[t("Start laundry — first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
+    b("2:30 – 2:55 PM","eBay — List 5 Items","🛒",C.ebay,"Weekly listing session.",ebayTasks),
+    b("2:55 – 4:00 PM","Reforged Weekly Review","🏗️",C.reforged,"Set direction for the week.",[t("Weekly review — Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
+    b("4:00 – 6:30 PM","Personal / Family Time","☀️",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
+    b("6:30 – 8:00 PM","Family Dinner","🍴",C.dinner,"Protected family time.",dinnerTasks),
+    b("8:00 – 9:00 PM","Evening Tasks","📱",C.admin,"Light work from your phone.",eveningTasks),
+    b("9:00 – 9:30 PM","Wind Down","🌙",C.wind,"Good sleep Sunday sets the tone for the whole week.",windTasks),
+  ],
+};
+
+// ─── State ──────────────────────────────────────────────────────────────────
+const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const todayIdx = new Date().getDay();
+const todayStr = dayNames[todayIdx];
+
+let mode = "work";
+let activeDay = DAYS.includes(todayStr) ? todayStr : "Mon";
+let checked = {};
+let openBlock = null;
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+function getSchedule() { return mode === "work" ? WORK[activeDay] : OFF[activeDay]; }
+
+function countProgress() {
+  const s = getSchedule();
+  let done = 0, total = 0;
+  s.forEach((block, bi) => {
+    block.tasks.forEach((_, ti) => {
+      total++;
+      if (checked[`${mode}-${activeDay}-${bi}-${ti}`]) done++;
+    });
+  });
+  return { done, total };
+}
+
+function renderHeader() {
+  const accent = mode === "work" ? "#F4A261" : "#95D5B2";
+  const modeLabel = mode === "work" ? "Reforged · Daily Command Center" : "Reforged · Day Off Mode";
+  const subtitle = mode === "work"
+    ? DAY_META.work[activeDay]
+    : DAY_META.off[activeDay];
+
+  document.getElementById("mode-label").textContent = modeLabel;
+  document.getElementById("mode-label").style.color = accent;
+  document.getElementById("day-title").textContent =
+    (activeDay === todayStr ? "Today — " : "") + activeDay;
+  document.getElementById("day-subtitle").textContent = subtitle;
+
+  // mode buttons
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.className = "mode-btn";
+    if (btn.textContent === "Work Day" && mode === "work") btn.classList.add("active-work");
+    if (btn.textContent === "Day Off" && mode === "off") btn.classList.add("active-off");
+  });
+
+  // day tabs
+  const tabsEl = document.getElementById("day-tabs");
+  tabsEl.innerHTML = "";
+  DAYS.forEach(d => {
+    const btn = document.createElement("button");
+    btn.className = "day-tab";
+    btn.textContent = d;
+    if (d === todayStr) btn.classList.add("today-tab");
+    if (d === activeDay) btn.classList.add(mode === "work" ? "active-work" : "active-off");
+    btn.onclick = () => { activeDay = d; openBlock = null; render(); };
+    tabsEl.appendChild(btn);
+  });
+
+  // progress
+  const { done, total } = countProgress();
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById("progress-text").textContent = `${done} / ${total} tasks`;
+  document.getElementById("progress-pct").textContent = pct + "%";
+  document.getElementById("progress-pct").style.color = pct === 100 ? "#95D5B2" : accent;
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("progress-bar").style.background =
+    mode === "work"
+      ? "linear-gradient(90deg,#F4A261,#FF6B6B)"
+      : "linear-gradient(90deg,#95D5B2,#4CC9F0)";
+}
+
+function renderBlocks() {
+  const schedule = getSchedule();
+  const container = document.getElementById("blocks");
+  container.innerHTML = "";
+
+  schedule.forEach((block, bi) => {
+    const doneTasks = block.tasks.filter((_,ti) => checked[`${mode}-${activeDay}-${bi}-${ti}`]).length;
+    const total = block.tasks.length;
+    const complete = doneTasks === total;
+    const isOpen = openBlock === bi;
+
+    const blockEl = document.createElement("div");
+    blockEl.className = "block" + (complete ? " complete" : "");
+    blockEl.style.border = `1px solid ${complete ? block.color + "55" : "rgba(255,255,255,0.07)"}`;
+    blockEl.style.background = complete
+      ? `linear-gradient(135deg,${block.color}14,${block.color}07)`
+      : "rgba(255,255,255,0.025)";
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "block-header";
+    header.onclick = () => { openBlock = isOpen ? null : bi; renderBlocks(); renderHeader(); };
+
+    const iconEl = document.createElement("div");
+    iconEl.className = "block-icon";
+    iconEl.style.background = block.color + "1e";
+    iconEl.style.border = `1px solid ${block.color}3a`;
+    iconEl.textContent = block.icon;
+
+    const infoEl = document.createElement("div");
+    infoEl.className = "block-info";
+    infoEl.innerHTML = `
+      <div>
+        <span class="block-name" style="color:${complete ? block.color : "#eae8f2"}">${block.label}</span>
+        <span class="block-time">${block.time}</span>
+      </div>
+      <div class="block-mini-bar-row">
+        <div class="block-mini-bar-bg">
+          <div class="block-mini-bar" style="width:${total ? (doneTasks/total)*100 : 0}%;background:${block.color}"></div>
+        </div>
+        <span class="block-count">${doneTasks}/${total}</span>
+      </div>`;
+
+    const chevron = document.createElement("span");
+    chevron.className = "block-chevron" + (isOpen ? " open" : "");
+    chevron.textContent = "▾";
+
+    header.appendChild(iconEl);
+    header.appendChild(infoEl);
+    header.appendChild(chevron);
+    blockEl.appendChild(header);
+
+    // Body
+    if (isOpen) {
+      const body = document.createElement("div");
+      body.className = "block-body open";
+
+      if (block.note) {
+        const note = document.createElement("div");
+        note.className = "block-note";
+        note.style.color = block.color;
+        note.style.background = block.color + "10";
+        note.style.borderLeftColor = block.color;
+        note.textContent = block.note;
+        body.appendChild(note);
+      }
+
+      block.tasks.forEach((task, ti) => {
+        const key = `${mode}-${activeDay}-${bi}-${ti}`;
+        const done = !!checked[key];
+        const tagColor = TAG_C[task.tag] || "#888";
+
+        const taskEl = document.createElement("div");
+        taskEl.className = "task";
+        taskEl.onclick = () => {
+          checked[key] = !checked[key];
+          renderBlocks();
+          renderHeader();
+        };
+
+        const checkEl = document.createElement("div");
+        checkEl.className = "task-check";
+        checkEl.style.border = `1.5px solid ${done ? block.color : "rgba(255,255,255,0.18)"}`;
+        checkEl.style.background = done ? block.color : "transparent";
+        checkEl.textContent = done ? "✓" : "";
+
+        const textEl = document.createElement("span");
+        textEl.className = "task-text" + (done ? " done" : "");
+        textEl.textContent = task.text;
+
+        const tagEl = document.createElement("span");
+        tagEl.className = "task-tag";
+        tagEl.style.background = tagColor + "1a";
+        tagEl.style.color = tagColor;
+        tagEl.style.border = `1px solid ${tagColor}38`;
+        tagEl.textContent = task.tag;
+
+        taskEl.appendChild(checkEl);
+        taskEl.appendChild(textEl);
+        taskEl.appendChild(tagEl);
+        body.appendChild(taskEl);
+      });
+
+      blockEl.appendChild(body);
+    }
+
+    container.appendChild(blockEl);
+  });
+
+  // Legend
+  const legendTags = document.getElementById("legend-tags");
+  legendTags.innerHTML = "";
+  Object.entries(TAG_C).forEach(([tag, color]) => {
+    const span = document.createElement("span");
+    span.className = "legend-tag";
+    span.style.background = color + "16";
+    span.style.color = color;
+    span.style.border = `1px solid ${color}36`;
+    span.textContent = tag;
+    legendTags.appendChild(span);
+  });
+}
+
+function render() { renderHeader(); renderBlocks(); }
+
+function setMode(m) { mode = m; openBlock = null; render(); }
+
+// Init
+render();
+</script>
+</body>
+</html>
