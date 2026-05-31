@@ -92,9 +92,13 @@ const waT=[t("1 hour walk","Walk"),t("Log steps in Apple Health","Fitness")];
 const eT=[t("List item 1","eBay"),t("List item 2","eBay"),t("List item 3","eBay"),t("List item 4","eBay"),t("List item 5","eBay")];
 const diT=[t("Dinner with family \u2014 present, not distracted","Personal"),t("Log dinner in MacroFactor after","Nutrition")];
 const wiT=[t("Final MacroFactor nutrition log","Nutrition"),t("Review tomorrow's top priority (1 min)","Admin"),t("CPAP setup \u2014 consistent bedtime","Fitness")];
-const evT=[t("Dishes / kitchen cleanup","Home"),t("Trash / small household tasks","Home"),t("Reforged social media or light reading (phone)","Reforged"),t("MacroFactor weekly check-in if due","Fitness")];
+const evT=[t("Dishes / kitchen cleanup","Home"),t("Trash / small household tasks","Home"),t("Reply to Instagram comments or DMs (phone)","Reforged"),t("Engage in Fort Bend Facebook groups if not done today","Reforged"),t("MacroFactor weekly check-in if due","Fitness")];
 const hoT=[t("Tidying / surfaces / clutter","Home"),t("Trash if needed","Home"),t("Spot vacuum or sweep as needed","Home")];
 const rfT=(note)=>[t("Gym Bible or Roadmap \u2014 one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")];
+const rfPost=[t("Finalize caption \u2014 make any last edits","Reforged"),t("Post to Instagram","Reforged"),t("Add hashtags as first comment immediately","Reforged"),t("Share post to Instagram Story","Reforged"),t("Cross-post manually to Reforged Facebook page","Reforged")];
+const rfCreate=[t("Write captions for next 2 upcoming posts","Reforged"),t("Gather or take photos needed for upcoming posts","Reforged"),t("Check content calendar \u2014 what\u2019s due this week?","Reforged"),t("Film content if workout or run content is planned","Reforged"),t("Review and respond to any comments or DMs","Reforged")];
+const rfReview=[t("Review content calendar \u2014 what posts are due this week?","Reforged"),t("Confirm photos/captions are ready for Tue + Thu posts","Reforged"),t("Draft or refine Saturday post if not done","Reforged"),t("Check analytics \u2014 what performed best this week?","Reforged"),t("Engage in Fort Bend Facebook groups (5\u201310 min)","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged")];
+const rfEngage=[t("Engage in Fort Bend Facebook groups (5 min)","Reforged"),t("Reply to any Instagram comments or DMs","Reforged")];
 
 const WORK={
 Mon:[
@@ -125,7 +129,7 @@ Tue:[
   b("4:40 \u2013 5:15 PM","Run (30\u201335 min)","\uD83C\uDFC3",C.run,"Post-workout run. Consistency here built your 5K.",ruT),
   b("5:15 \u2013 5:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
   b("5:40 \u2013 6:10 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("6:10 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"20 min daily touch \u2014 small and consistent.",rfT()),
+  b("6:10 \u2013 6:30 PM","Reforged \u2014 Post Day","\uD83D\uDCF1",C.reforged,"Tuesday post goes live this evening. Get it out before dinner.",rfPost),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -141,7 +145,7 @@ Wed:[
   b("3:45 \u2013 4:45 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Active recovery. Podcast or audiobook.",waT),
   b("4:45 \u2013 5:10 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
   b("5:10 \u2013 5:40 PM","Household (mid-week)","\uD83C\uDFE0",C.house,"Deeper mid-week clean.",[t("Vacuuming \u2014 main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces","Home"),t("Trash if needed","Home")]),
-  b("5:40 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Biggest Reforged block of the week \u2014 no workout competing.",rfT()),
+  b("5:40 \u2013 6:30 PM","Reforged \u2014 Content Creation","\uD83C\uDFD7\uFE0F",C.reforged,"Biggest Reforged block of the week \u2014 write, create, plan ahead.",rfCreate),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -158,7 +162,7 @@ Thu:[
   b("4:40 \u2013 5:15 PM","Run (30\u201335 min)","\uD83C\uDFC3",C.run,"Post-workout run.",ruT),
   b("5:15 \u2013 5:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
   b("5:40 \u2013 6:10 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("6:10 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"20 min daily touch.",rfT()),
+  b("6:10 \u2013 6:30 PM","Reforged \u2014 Post Day","\uD83D\uDCF1",C.reforged,"Thursday post goes live this evening. Same drill as Tuesday.",rfPost),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -183,10 +187,11 @@ Sat:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Weekend \u2014 still hit the scale.",mT),
   b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block. No work pressure \u2014 use it well.",[t("WGU module or PA draft","WGU"),t("NASM Block 2 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
   b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout.",woT),
-  b("11:30 AM \u2013 12:05 PM","Run (flexible)","\uD83C\uDFC3",C.run,"Saturday run \u2014 flexible, go longer if you want.",ruT),
-  b("12:05 \u2013 12:30 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
-  b("12:30 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
-  b("3:00 \u2013 4:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Good day for bigger-picture planning.",[t("Gym Bible or Roadmap work","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
+  b("11:30 AM \u2013 12:05 PM","Run (flexible)","\uD83C\uDFC3",C.run,"Saturday post goes live after this run. Snap a post-run photo if it fits.",ruT),
+  b("12:05 \u2013 12:15 PM","Reforged \u2014 Post Day","\uD83D\uDCF1",C.reforged,"Get the Saturday post out while you're in the moment.",rfPost),
+  b("12:15 \u2013 12:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
+  b("12:40 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+  b("3:00 \u2013 4:00 PM","Reforged \u2014 Content + Planning","\uD83C\uDFD7\uFE0F",C.reforged,"Post is live. Use this block to get ahead for next week.",[t("Confirm Saturday post is live + shared to Story","Reforged"),t("Cross-post to Facebook if not done yet","Reforged"),t("Plan or draft content for next week","Reforged"),t("Gym Bible or Roadmap work if time allows","Reforged")]),
   b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Saturday Evening","\uD83D\uDCF1",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
@@ -198,7 +203,7 @@ Sun:[
   b("10:30 \u2013 11:30 AM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Sunday walk \u2014 mental reset before the week ahead.",waT),
   b("11:30 AM \u2013 2:00 PM","Laundry + Yardwork","\uD83C\uDFE1",C.house,"Primary home day. Run laundry while you do the yard.",[t("Start laundry \u2014 first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
   b("2:00 \u2013 2:25 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Weekly listing session.",eT),
-  b("2:25 \u2013 3:30 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week.",[t("Weekly review \u2014 Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
+  b("2:25 \u2013 3:30 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week. Content review is part of this.",rfReview),
   b("3:30 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
@@ -234,7 +239,7 @@ Tue:[
   b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
   b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
   b("4:30 \u2013 5:05 PM","Run (30\u201335 min)","\uD83C\uDFC3",C.run,"Post-workout run.",ruT),
-  b("5:05 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
+  b("5:05 \u2013 6:30 PM","Reforged \u2014 Post Day + Bonus","\uD83D\uDCF1",C.reforged,"Tuesday post goes live today. Day off = more time to engage after posting.",[t("Finalize caption \u2014 make any last edits","Reforged"),t("Post to Instagram","Reforged"),t("Add hashtags as first comment immediately","Reforged"),t("Share post to Instagram Story","Reforged"),t("Cross-post manually to Reforged Facebook page","Reforged"),t("Spend 15 min engaging with comments + Fort Bend FB groups","Reforged")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -245,7 +250,7 @@ Wed:[
   b("10:30 \u2013 11:30 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Biggest NASM block of the week.",[t("Block 2: Client Relations & Coaching","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference \u2014 relevant chapter","NASM")]),
   b("11:30 AM \u2013 12:30 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Mid-morning walk \u2014 mental break between study and the rest of the day.",waT),
   b("12:30 \u2013 1:00 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("1:00 \u2013 2:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"90 min \u2014 biggest Reforged block of the week.",rfT()),
+  b("1:00 \u2013 2:30 PM","Reforged \u2014 Content Creation","\uD83C\uDFD7\uFE0F",C.reforged,"90 min \u2014 biggest content block of the week. Write, create, get ahead.",rfCreate),
   b("2:30 \u2013 2:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
   b("2:55 \u2013 3:30 PM","Household (rest day)","\uD83C\uDFE0",C.house,"Deeper mid-week clean.",[t("Vacuuming \u2014 main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces / clutter","Home"),t("Trash if needed","Home")]),
   b("3:30 \u2013 6:30 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Long rest afternoon \u2014 earned it.",[t("Rest, hobby, or anything you want","Personal"),t("Family time","Personal")]),
@@ -264,7 +269,7 @@ Thu:[
   b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
   b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
   b("4:30 \u2013 5:05 PM","Run (30\u201335 min)","\uD83C\uDFC3",C.run,"Post-workout run.",ruT),
-  b("5:05 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
+  b("5:05 \u2013 6:30 PM","Reforged \u2014 Post Day + Bonus","\uD83D\uDCF1",C.reforged,"Thursday post goes live today. Day off gives extra time to engage.",[t("Finalize caption \u2014 make any last edits","Reforged"),t("Post to Instagram","Reforged"),t("Add hashtags as first comment immediately","Reforged"),t("Share post to Instagram Story","Reforged"),t("Cross-post manually to Reforged Facebook page","Reforged"),t("Spend 15 min engaging with comments + Fort Bend FB groups","Reforged")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -289,10 +294,11 @@ Sat:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Weekend \u2014 still hit the scale.",mT),
   b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block.",[t("WGU module or PA draft","WGU"),t("NASM Block 2 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
   b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout.",woT),
-  b("11:30 AM \u2013 12:05 PM","Run (flexible)","\uD83C\uDFC3",C.run,"Saturday run \u2014 flexible, go longer if you want.",ruT),
-  b("12:05 \u2013 12:30 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
-  b("12:30 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
-  b("3:00 \u2013 4:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Good day for bigger-picture planning.",[t("Gym Bible or Roadmap work","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
+  b("11:30 AM \u2013 12:05 PM","Run (flexible)","\uD83C\uDFC3",C.run,"Saturday post goes live after this run. Snap a post-run photo if it fits the content.",ruT),
+  b("12:05 \u2013 12:15 PM","Reforged \u2014 Post Day","\uD83D\uDCF1",C.reforged,"Get the Saturday post out while you're still in the moment.",rfPost),
+  b("12:15 \u2013 12:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
+  b("12:40 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+  b("3:00 \u2013 4:00 PM","Reforged \u2014 Content + Planning","\uD83C\uDFD7\uFE0F",C.reforged,"Post is live. Now get ahead for next week.",[t("Confirm Saturday post is live + shared to Story","Reforged"),t("Cross-post to Facebook if not done yet","Reforged"),t("Plan or draft content for next week","Reforged"),t("Gym Bible or Roadmap work if time allows","Reforged")]),
   b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Saturday Evening","\uD83D\uDCF1",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
@@ -304,7 +310,7 @@ Sun:[
   b("10:30 \u2013 11:15 AM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Sunday walk \u2014 mental reset before the week ahead.",waT),
   b("11:15 AM \u2013 2:30 PM","Laundry + Yardwork","\uD83C\uDFE1",C.house,"Primary home day. Laundry runs while you do the yard.",[t("Start laundry \u2014 first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
   b("2:30 \u2013 2:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Weekly listing session.",eT),
-  b("2:55 \u2013 4:00 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week.",[t("Weekly review \u2014 Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
+  b("2:55 \u2013 4:00 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week. Content review is part of this.",rfReview),
   b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
