@@ -341,6 +341,23 @@ Sun:[
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Good sleep Sunday sets the tone for the whole week.",wiT),
 ],
 };
+function getTodayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+function loadChecked(){
+  try{
+    const s=localStorage.getItem("reforged_checked");
+    if(!s) return {};
+    const p=JSON.parse(s);
+    if(p._date!==getTodayKey()){localStorage.removeItem("reforged_checked");return {};}
+    return p.data||{};
+  }catch(e){return {};}
+}
+function saveChecked(){
+  try{localStorage.setItem("reforged_checked",JSON.stringify({_date:getTodayKey(),data:checked}));}catch(e){}
+}
+
 const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const todayStr=dayNames[new Date().getDay()];
 let mode="work";
