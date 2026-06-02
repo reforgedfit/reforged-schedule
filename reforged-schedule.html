@@ -80,22 +80,48 @@ body{font-family:Georgia,serif;background:#0c0c18;color:#eae8f2;min-height:100vh
 const C={dnd:"#9B59B6",morning:"#F4A261",work:"#8ECAE6",reset:"#95D5B2",wgu:"#E07A8F",nasm:"#C77DFF",workout:"#FF6B6B",run:"#FF9F43",walk:"#81C784",reforged:"#4CC9F0",dinner:"#FFD166",wind:"#6D6875",personal:"#90E0EF",admin:"#E9C46A",ebay:"#86BBD8",house:"#A8C5A0",commute:"#B0B0C0"};
 const TAG_C={DnD:"#9B59B6",Fitness:"#FF6B6B",Nutrition:"#95D5B2",WGU:"#E07A8F",NASM:"#C77DFF",Reforged:"#4CC9F0",Admin:"#E9C46A",Work:"#8ECAE6",Personal:"#90E0EF",Run:"#FF9F43",Walk:"#81C784",eBay:"#86BBD8",Home:"#A8C5A0"};
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const DAY_META={work:{Mon:"Workout \u00b7 Walk",Tue:"Workout \u00b7 Run",Wed:"Rest \u00b7 Walk \u00b7 Extra Study",Thu:"Workout \u00b7 Run",Fri:"Workout \u00b7 Walk",Sat:"Workout \u00b7 Run \u00b7 Errands",Sun:"Rest \u00b7 Walk \u00b7 Laundry & Yard"},off:{Mon:"Workout \u00b7 Walk",Tue:"Workout \u00b7 Run",Wed:"Rest \u00b7 Walk \u00b7 Big Study Day",Thu:"Workout \u00b7 Run",Fri:"Workout \u00b7 Walk",Sat:"Workout \u00b7 Run \u00b7 Errands",Sun:"Rest \u00b7 Walk \u00b7 Laundry & Yard"}};
+const DAY_META={
+  work:{
+    Mon:"Workout \u00b7 Evening Walk",
+    Tue:"Workout \u00b7 Run \u00b7 Post Day \ud83d\udcf1",
+    Wed:"Rest \u00b7 Evening Walk \u00b7 Extra Study",
+    Thu:"Workout \u00b7 Run \u00b7 Post Day \ud83d\udcf1",
+    Fri:"Workout \u00b7 Evening Walk",
+    Sat:"Workout \u00b7 Run \u00b7 Post Day \u00b7 Errands",
+    Sun:"Rest \u00b7 D&D \ud83c\udfb2"
+  },
+  off:{
+    Mon:"Morning Walk \u00b7 Workout",
+    Tue:"Morning Run \u00b7 Workout \u00b7 Post Day \ud83d\udcf1",
+    Wed:"Morning Walk \u00b7 Rest \u00b7 Big Study Day",
+    Thu:"Morning Run \u00b7 Workout \u00b7 Post Day \ud83d\udcf1",
+    Fri:"Morning Walk \u00b7 Workout",
+    Sat:"Workout \u00b7 Run \u00b7 Post Day \u00b7 Errands",
+    Sun:"Morning Walk \u00b7 Rest \u00b7 D&D \ud83c\udfb2"
+  }
+};
 
 const b=(time,label,icon,color,note,tasks)=>({time,label,icon,color,note,tasks});
 const t=(text,tag)=>({text,tag});
 
+// Shared task arrays
 const mT=[t("CPAP removal & eufy weigh-in","Fitness"),t("Log weight & body comp in MacroFactor","Fitness"),t("16\u201324 oz water + high-protein breakfast","Nutrition")];
 const woT=[t("MacroFactor workout \u2014 follow current program","Fitness"),t("Log workout in MacroFactor","Fitness"),t("Post-workout protein","Nutrition")];
 const ruT=[t("Run \u2014 30\u201335 min","Run"),t("Log in Apple Health / MacroFactor","Fitness"),t("Post-run hydration & refuel","Nutrition")];
-const waT=[t("1 hour walk","Walk"),t("Log steps in Apple Health","Fitness")];
+const waT=[t("1 hour walk","Walk"),t("Log steps in Apple Health","Fitness"),t("WGU lecture audio or NASM review (headphones)","WGU")];
 const eT=[t("List item 1","eBay"),t("List item 2","eBay"),t("List item 3","eBay"),t("List item 4","eBay"),t("List item 5","eBay")];
 const diT=[t("Dinner with family \u2014 present, not distracted","Personal"),t("Log dinner in MacroFactor after","Nutrition")];
 const wiT=[t("Final MacroFactor nutrition log","Nutrition"),t("Review tomorrow's top priority (1 min)","Admin"),t("CPAP setup \u2014 consistent bedtime","Fitness")];
 const evT=[t("Dishes / kitchen cleanup","Home"),t("Trash / small household tasks","Home"),t("Reforged social media or light reading (phone)","Reforged"),t("MacroFactor weekly check-in if due","Fitness")];
 const hoT=[t("Tidying / surfaces / clutter","Home"),t("Trash if needed","Home"),t("Spot vacuum or sweep as needed","Home")];
-const rfT=(note)=>[t("Gym Bible or Roadmap \u2014 one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")];
+const rfT=()=>[t("Gym Bible or Roadmap \u2014 one section","Reforged"),t("Competitor research or market notes","Reforged"),t("Social content planning or drafting","Reforged")];
+const postT=[t("Finalize caption","Reforged"),t("Post to @reforgedfit","Reforged"),t("Add hashtags as first comment","Reforged"),t("Share to Story","Reforged"),t("Cross-post to Reforged Fitness Facebook","Reforged")];
+const runPostT=[t("Run \u2014 30\u201335 min","Run"),t("Capture photo or clip for today's post \ud83d\udcf8","Reforged"),t("Log in Apple Health / MacroFactor","Fitness"),t("Post-run hydration & refuel","Nutrition")];
+const dndT=[t("D&D session \u2014 show up ready","DnD"),t("Dinner happens during this block","DnD")];
 
+// ═══════════════════════════════════════
+// WORK DAY SCHEDULE
+// ═══════════════════════════════════════
 const WORK={
 Mon:[
   b("6:00 \u2013 6:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Your data is your content \u2014 don't skip the scale.",mT),
@@ -103,12 +129,12 @@ Mon:[
   b("7:00 AM \u2013 1:00 PM","Work","\uD83D\uDCBC",C.work,"Full focus. No side-project bleed.",[t("Job focus block \u2014 protect this time","Work")]),
   b("1:00 \u2013 1:10 PM","Commute Home","\uD83D\uDE97",C.commute,null,[t("10 min commute home","Work")]),
   b("1:10 \u2013 1:40 PM","Reset & Lunch","\uD83C\uDF7D\uFE0F",C.reset,"Brain shift \u2014 work mode to build mode.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
-  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Top priority. PA/assessment pending? Drop the prompt in Claude and use body-doubling to start.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Economics \u2014 market efficiency focus. Drop prompt in Claude if needed.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
   b("2:40 \u2013 3:10 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
   b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program. Training + transformation content.",woT),
-  b("5:30 \u2013 6:30 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Evening walk \u2014 cooler temps post-commute. Good WGU lecture audio or NASM review time.",waT),
-  b("5:40 \u2013 6:05 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each. Stack the listings.",eT),
-  b("6:05 \u2013 6:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance \u2014 keeps the week from piling up.",hoT),
+  b("4:40 \u2013 5:10 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each. Stack the listings.",eT),
+  b("5:10 \u2013 5:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance \u2014 keeps the week from piling up.",hoT),
+  b("5:30 \u2013 6:30 PM","Evening Walk","\uD83D\uDEB6",C.walk,"Cooler temps. Good time for WGU lecture audio or NASM review.",waT),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time. No phone, no laptop at the table.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone + simple household tasks.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else \u2014 protect it.",wiT),
@@ -119,14 +145,13 @@ Tue:[
   b("7:00 AM \u2013 1:00 PM","Work","\uD83D\uDCBC",C.work,"Full focus.",[t("Job focus block \u2014 protect this time","Work")]),
   b("1:00 \u2013 1:10 PM","Commute Home","\uD83D\uDE97",C.commute,null,[t("10 min commute home","Work")]),
   b("1:10 \u2013 1:40 PM","Reset & Lunch","\uD83C\uDF7D\uFE0F",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
-  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Top priority. PA/assessment pending? Use this block.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Economics \u2014 top priority. Use this block.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
   b("2:40 \u2013 3:10 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
-  b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
-  b("5:00 \u2013 5:35 PM","Run + Content \ud83d\udfa5","\ud83c\udfc3",C.run,"POST DAY \u2014 capture a running clip or photo for today's post.",[t("Run \u2014 30\u201335 min","Run"),t("Capture running photo or clip for Tue post","Reforged"),t("Log in Apple Health / MacroFactor","Fitness"),t("Post-run hydration","Nutrition")]),
-  b("5:35 \u2013 6:00 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Tue evening post \u2014 publish now.",[t("Finalize caption","Reforged"),t("Post to @reforgedfit","Reforged"),t("Add hashtags in first comment","Reforged"),t("Share to Story","Reforged"),t("Cross-post to Reforged Fitness Facebook","Reforged")]),
-  b("5:15 \u2013 5:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("5:40 \u2013 6:10 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("6:10 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"20 min daily touch \u2014 small and consistent.",rfT()),
+  b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program. Capture workout clip for content if needed.",woT),
+  b("4:40 \u2013 5:15 PM","Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"POST DAY \u2014 capture a running clip or photo for tonight's post.",runPostT),
+  b("5:15 \u2013 5:45 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Tue evening post \u2014 publish now.",postT),
+  b("5:45 \u2013 6:10 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("6:10 \u2013 6:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -137,12 +162,13 @@ Wed:[
   b("7:00 AM \u2013 1:00 PM","Work","\uD83D\uDCBC",C.work,"Full focus.",[t("Job focus block \u2014 protect this time","Work")]),
   b("1:00 \u2013 1:10 PM","Commute Home","\uD83D\uDE97",C.commute,null,[t("10 min commute home","Work")]),
   b("1:10 \u2013 1:40 PM","Reset & Lunch","\uD83C\uDF7D\uFE0F",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
-  b("1:40 \u2013 3:00 PM","WGU Study","\uD83D\uDCDA",C.wgu,"No workout today \u2014 full 80 min. Great day to tackle a complete module or PA.",[t("Economics — full module or assessment","WGU"),t("If PA/assessment pending \u2192 body-doubling session with Claude","WGU"),t("Review rubric before submitting anything","WGU")]),
-  b("3:00 \u2013 3:45 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Longer block on rest day \u2014 push deeper into Block 2.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference \u2014 relevant chapter","NASM")]),
-  b("3:45 \u2013 4:45 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Active recovery. Podcast or audiobook.",waT),
-  b("4:45 \u2013 5:10 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("5:10 \u2013 5:40 PM","Household (mid-week)","\uD83C\uDFE0",C.house,"Deeper mid-week clean.",[t("Vacuuming \u2014 main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces","Home"),t("Trash if needed","Home")]),
-  b("5:40 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Biggest Reforged block of the week \u2014 no workout competing.",rfT()),
+  b("1:40 \u2013 3:00 PM","WGU Study","\uD83D\uDCDA",C.wgu,"No workout today \u2014 full 80 min. Great day to tackle a complete module.",[t("Economics \u2014 full module or assessment","WGU"),t("If assessment pending \u2192 body-doubling session with Claude","WGU"),t("Review rubric before submitting anything","WGU")]),
+  b("3:00 \u2013 3:45 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Longer block on rest day \u2014 push deeper into Block 5.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference \u2014 relevant chapter","NASM")]),
+  b("3:45 \u2013 4:15 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Content creation day.",rfT()),
+  b("4:15 \u2013 4:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("4:40 \u2013 5:00 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
+  b("5:00 \u2013 6:00 PM","Evening Walk","\uD83D\uDEB6",C.walk,"Cooler temps. Good time for WGU lecture audio or NASM review.",waT),
+  b("6:00 \u2013 6:30 PM","Reforged \u2014 Content Wrap","\uD83C\uDFD7\uFE0F",C.reforged,"Finish anything from this afternoon. Queue upcoming posts.",[t("Finalize any content from this afternoon","Reforged"),t("Review Tue/Thu post readiness","Reforged"),t("Queue upcoming post drafts","Reforged")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -153,14 +179,13 @@ Thu:[
   b("7:00 AM \u2013 1:00 PM","Work","\uD83D\uDCBC",C.work,"Full focus.",[t("Job focus block \u2014 protect this time","Work")]),
   b("1:00 \u2013 1:10 PM","Commute Home","\uD83D\uDE97",C.commute,null,[t("10 min commute home","Work")]),
   b("1:10 \u2013 1:40 PM","Reset & Lunch","\uD83C\uDF7D\uFE0F",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
-  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Top priority. PA/assessment pending? Use this block.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"Economics \u2014 top priority. Use this block.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
   b("2:40 \u2013 3:10 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 continues.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
-  b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
-  b("5:00 \u2013 5:35 PM","Run + Content \ud83d\udfa5","\ud83c\udfc3",C.run,"POST DAY \u2014 capture a clip or photo for Thu post.",[t("Run \u2014 30\u201335 min","Run"),t("Capture content for Thu post","Reforged"),t("Log in Apple Health / MacroFactor","Fitness"),t("Post-run hydration","Nutrition")]),
-  b("5:35 \u2013 6:00 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Thu evening post \u2014 publish now.",[t("Finalize caption","Reforged"),t("Post to @reforgedfit","Reforged"),t("Add hashtags in first comment","Reforged"),t("Share to Story","Reforged"),t("Cross-post to Reforged Fitness Facebook","Reforged")]),
-  b("5:15 \u2013 5:40 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("5:40 \u2013 6:10 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("6:10 \u2013 6:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"20 min daily touch.",rfT()),
+  b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program. Capture workout clip for content if needed.",woT),
+  b("4:40 \u2013 5:15 PM","Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"POST DAY \u2014 capture a clip or photo for tonight's post.",runPostT),
+  b("5:15 \u2013 5:45 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Thu evening post \u2014 publish now.",postT),
+  b("5:45 \u2013 6:10 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("6:10 \u2013 6:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
@@ -171,24 +196,24 @@ Fri:[
   b("7:00 AM \u2013 1:00 PM","Work","\uD83D\uDCBC",C.work,"Full focus through the finish line.",[t("Job focus block \u2014 protect this time","Work")]),
   b("1:00 \u2013 1:10 PM","Commute Home","\uD83D\uDE97",C.commute,null,[t("10 min commute home","Work")]),
   b("1:10 \u2013 1:40 PM","Reset & Lunch","\uD83C\uDF7D\uFE0F",C.reset,"Brain shift.",[t("Log lunch in MacroFactor","Nutrition"),t("Decompress before afternoon blocks","Personal")]),
-  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"End-of-week push \u2014 don't let WGU slide into the weekend.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 use this block to finish it","WGU")]),
-  b("2:40 \u2013 3:10 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 wrap-up \u2014 note anything to revisit this weekend.",[t("Block 5: review or practice questions","NASM"),t("Note weak areas in exercise technique","NASM")]),
+  b("1:40 \u2013 2:40 PM","WGU Study","\uD83D\uDCDA",C.wgu,"End-of-week push \u2014 don't let economics slide into the weekend.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 use this block to finish it","WGU")]),
+  b("2:40 \u2013 3:10 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 wrap-up \u2014 note anything to revisit this weekend.",[t("Block 5 review or practice questions","NASM"),t("Note weak areas to revisit over the weekend","NASM")]),
   b("3:10 \u2013 4:40 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Friday workout \u2014 strong finish to the training week.",woT),
-  b("5:30 \u2013 6:30 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Evening walk \u2014 cooler temps. Good podcast or WGU lecture audio time.",waT),
-  b("5:40 \u2013 6:05 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"End the week with a clean queue.",eT),
-  b("6:05 \u2013 6:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Set yourself up for a clean weekend.",hoT),
-  b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Start the weekend with family time.",diT),
+  b("4:40 \u2013 5:05 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"End the week with a clean queue.",eT),
+  b("5:05 \u2013 5:30 PM","Household (daily)","\uD83C\uDFE0",C.house,"Set yourself up for a clean weekend.",hoT),
+  b("5:30 \u2013 6:30 PM","Evening Walk","\uD83D\uDEB6",C.walk,"Cooler temps. Good podcast or WGU lecture audio time.",waT),
+  b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Start the weekend right.",diT),
   b("8:00 \u2013 9:00 PM","Friday Evening","\uD83D\uDCF1",C.personal,"Wind down into the weekend.",[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / personal decompression","Personal")]),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Good sleep Friday sets up a strong Saturday.",wiT),
 ],
 Sat:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Weekend \u2014 still hit the scale.",mT),
-  b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block. No work pressure \u2014 use it well.",[t("Economics — module or PA draft","WGU"),t("NASM Block 5 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
-  b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout.",woT),
-  b("11:30 AM \u2013 12:05 PM","Run + Post Day \ud83d\udfa5","\ud83c\udfc3",C.run,"POST DAY \u2014 capture running photo or clip for Sat post. Publish after the run.",[t("Run \u2014 flexible distance","Run"),t("Capture photo or clip for Sat post","Reforged"),t("Post to @reforgedfit after run","Reforged"),t("Log in Apple Health / MacroFactor","Fitness")]),
-  b("12:05 \u2013 12:30 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
-  b("12:30 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
-  b("3:00 \u2013 4:00 PM","Reforged Business \ud83c\udfa5","\ud83c\udfd7\ufe0f",C.reforged,"THIS WEEK: YouTube origin story filming window. Film here if not done yet.",[t("PRIORITY THIS WEEK: Film YouTube origin story sections","Reforged"),t("Gym visits this week \u2014 review visit log before going","Reforged"),t("Social content planning or drafting","Reforged"),t("Weekly transformation log update","Reforged")]),
+  b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block. No work pressure \u2014 use it well.",[t("Economics \u2014 module or assessment draft","WGU"),t("NASM Block 5 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
+  b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout. THIS WEEK: film YouTube origin story sections if not done.",woT),
+  b("11:30 AM \u2013 12:10 PM","Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"POST DAY \u2014 capture running photo or clip for Sat post. Publish after the run.",[t("Run \u2014 flexible distance","Run"),t("Capture photo or clip for Sat post \ud83d\udcf8","Reforged"),t("Post to @reforgedfit right after run","Reforged"),t("Log in Apple Health / MacroFactor","Fitness")]),
+  b("12:10 \u2013 12:35 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
+  b("12:35 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+  b("3:00 \u2013 4:00 PM","Reforged Business \ud83c\udfa5","\uD83C\uDFD7\uFE0F",C.reforged,"THIS WEEK: YouTube origin story filming. Gym visits this week.",[t("PRIORITY THIS WEEK: Film YouTube origin story if not done","Reforged"),t("Gym visits this week \u2014 review visit log","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
   b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Saturday Evening","\uD83D\uDCF1",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
@@ -196,29 +221,32 @@ Sat:[
 ],
 Sun:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Rest day \u2014 still hit the scale.",mT),
-  b("8:30 \u2013 10:30 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Longest study block of the week.",[t("Economics — full module or assessment","WGU"),t("NASM Block 5 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
+  b("8:30 \u2013 10:30 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Longest study block of the week.",[t("Economics \u2014 full module or assessment","WGU"),t("NASM Block 5 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
   b("10:30 \u2013 11:30 AM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Sunday walk \u2014 mental reset before the week ahead.",waT),
   b("11:30 AM \u2013 2:00 PM","Laundry + Yardwork","\uD83C\uDFE1",C.house,"Primary home day. Run laundry while you do the yard.",[t("Start laundry \u2014 first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
   b("2:00 \u2013 2:25 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Weekly listing session.",eT),
   b("2:25 \u2013 3:30 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week.",[t("Weekly review \u2014 Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
   b("3:30 \u2013 6:00 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
-  b("6:00 \u2013 9:00 PM","D&D Campaign \ud83c\udfb2","\ud83c\udfb2",C.dnd,"Weekly D&D campaign \u2014 dinner happens during this block. Present and engaged.",[t("D&D session \u2014 show up ready","DnD"),t("Dinner during this block \u2014 no separate dinner needed","DnD")]),
+  b("6:00 \u2013 9:00 PM","D&D Campaign \ud83c\udfb2","\ud83c\udfb2",C.dnd,"Weekly D&D campaign \u2014 dinner happens during this block.",[t("D&D session \u2014 show up ready","DnD"),t("Dinner during this block","DnD")]),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Good sleep Sunday sets the tone for the whole week.",wiT),
 ],
 };
 
+// ═══════════════════════════════════════
+// DAY OFF SCHEDULE
+// ═══════════════════════════════════════
 const OFF={
 Mon:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Consistent start \u2014 same routine whether working or not.",mT),
-  b("8:30 \u2013 9:30 AM","Walk (1 hr)","\ud83d\udeb6",C.walk,"Morning walk \u2014 cooler temps. Great time for WGU lecture audio or NASM review.",[t("1 hour walk","Walk"),t("Log steps in Apple Health","Fitness"),t("WGU lecture audio or NASM review (headphones)","WGU")]),
-  b("8:30 \u2013 10:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions. No post-work fatigue.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
-  b("10:00 \u2013 10:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
-  b("10:45 AM \u2013 12:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
-  b("12:00 \u2013 12:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Step away from the screen. Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("12:30 \u2013 12:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("12:55 \u2013 1:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off. Rest is part of the plan.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
-  b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
+  b("8:30 \u2013 9:30 AM","Morning Walk","\uD83D\uDEB6",C.walk,"Cooler temps before the day heats up. Good WGU lecture audio or NASM review time.",waT),
+  b("9:30 \u2013 11:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions. No post-work fatigue.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("11:00 \u2013 11:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
+  b("11:45 AM \u2013 1:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
+  b("1:00 \u2013 1:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Step away from the screen. Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+  b("1:30 \u2013 1:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("1:55 \u2013 2:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
+  b("2:25 \u2013 4:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off. Rest is part of the plan.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+  b("4:00 \u2013 5:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
   b("5:30 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block \u2014 deeper work or genuine rest.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
@@ -226,27 +254,28 @@ Mon:[
 ],
 Tue:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Consistent start.",mT),
-  b("8:30 \u2013 10:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
-  b("10:00 \u2013 10:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
-  b("10:45 AM \u2013 12:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
-  b("12:00 \u2013 12:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("12:30 \u2013 12:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("12:55 \u2013 1:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
-  b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
-  b("8:30 \u2013 9:05 AM","Run + Content","\ud83c\udfc3",C.run,"Morning run \u2014 cooler temps. POST DAY: capture a photo or clip for today's post.",[t("Run \u2014 30\u201335 min","Run"),t("Capture photo or clip for today's post","Reforged"),t("Log in Apple Health / MacroFactor","Fitness"),t("Post-run hydration","Nutrition")]),
-  b("5:05 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
+  b("8:30 \u2013 9:05 AM","Morning Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"Cooler temps. POST DAY \u2014 capture a photo or clip for tonight's post.",runPostT),
+  b("9:05 \u2013 10:35 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("10:35 \u2013 11:20 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5: Exercise Technique & Special Populations.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
+  b("11:20 AM \u2013 12:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
+  b("12:30 \u2013 1:00 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+  b("1:00 \u2013 1:25 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("1:25 \u2013 1:55 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
+  b("1:55 \u2013 3:30 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+  b("3:30 \u2013 5:00 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program. Capture workout clip for content if needed.",woT),
+  b("5:00 \u2013 5:30 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Tue evening post \u2014 publish now.",postT),
+  b("5:30 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
 ],
 Wed:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Rest day \u2014 same start, same scale.",mT),
-  b("8:30 \u2013 10:30 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Rest day + day off = no excuses. Full 2 hours. Best day to finish a module or knock out a PA.",[t("Economics — full module or assessment","WGU"),t("If PA/assessment pending \u2192 body-doubling session with Claude","WGU"),t("Review rubric before submitting","WGU")]),
-  b("10:30 \u2013 11:30 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Biggest NASM block of the week.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference \u2014 relevant chapter","NASM")]),
-  b("11:30 AM \u2013 12:30 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Mid-morning walk \u2014 mental break between study and the rest of the day.",waT),
+  b("8:30 \u2013 9:30 AM","Morning Walk","\uD83D\uDEB6",C.walk,"Cooler temps before the day heats up. Good WGU lecture audio or NASM review.",waT),
+  b("9:30 \u2013 11:30 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Rest day + day off = no excuses. Full 2 hours. Best day to finish a module or knock out a PA.",[t("Economics \u2014 full module or assessment","WGU"),t("If PA pending \u2192 body-doubling session with Claude","WGU"),t("Review rubric before submitting","WGU")]),
+  b("11:30 AM \u2013 12:30 PM","NASM Study","\uD83E\uDDE0",C.nasm,"Biggest NASM block of the week.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Scenario-based practice questions","NASM"),t("NSCA cross-reference \u2014 relevant chapter","NASM")]),
   b("12:30 \u2013 1:00 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("1:00 \u2013 2:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"90 min \u2014 biggest Reforged block of the week.",rfT()),
+  b("1:00 \u2013 2:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"90 min \u2014 biggest Reforged block of the week. Content creation day.",rfT()),
   b("2:30 \u2013 2:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
   b("2:55 \u2013 3:30 PM","Household (rest day)","\uD83C\uDFE0",C.house,"Deeper mid-week clean.",[t("Vacuuming \u2014 main areas","Home"),t("Bathrooms quick wipe-down","Home"),t("Tidying / surfaces / clutter","Home"),t("Trash if needed","Home")]),
   b("3:30 \u2013 6:30 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Long rest afternoon \u2014 earned it.",[t("Rest, hobby, or anything you want","Personal"),t("Family time","Personal")]),
@@ -256,31 +285,32 @@ Wed:[
 ],
 Thu:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Consistent start.",mT),
-  b("8:30 \u2013 10:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
-  b("10:00 \u2013 10:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 continues.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
-  b("10:45 AM \u2013 12:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
-  b("12:00 \u2013 12:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("12:30 \u2013 12:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
-  b("12:55 \u2013 1:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
-  b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program.",woT),
-  b("4:30 \u2013 5:05 PM","Run (30\u201335 min)","\uD83C\uDFC3",C.run,"Post-workout run.",ruT),
-  b("5:05 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
+  b("8:30 \u2013 9:05 AM","Morning Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"Cooler temps. POST DAY \u2014 capture a photo or clip for tonight's post.",runPostT),
+  b("9:05 \u2013 10:35 AM","WGU Study","\uD83D\uDCDA",C.wgu,"Day off = best study conditions.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 open Claude, drop prompt, start writing","WGU")]),
+  b("10:35 \u2013 11:20 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 continues.",[t("Block 5: Exercise Technique & Special Populations","NASM"),t("Flashcard review or practice questions","NASM")]),
+  b("11:20 AM \u2013 12:30 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
+  b("12:30 \u2013 1:00 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+  b("1:00 \u2013 1:25 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"5 items \u00d7 ~5 min each.",eT),
+  b("1:25 \u2013 1:55 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
+  b("1:55 \u2013 3:30 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Genuinely off.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+  b("3:30 \u2013 5:00 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"MacroFactor program. Capture workout clip for content if needed.",woT),
+  b("5:00 \u2013 5:30 PM","Post Day \ud83d\udcf1","\ud83d\udcf1",C.reforged,"Thu evening post \u2014 publish now.",postT),
+  b("5:30 \u2013 6:30 PM","Extra Reforged / Personal","\uD83C\uDFD7\uFE0F",C.reforged,"Day-off bonus block.",[t("Deeper Reforged work (content, research, Gym Bible)","Reforged"),t("Or: genuinely rest \u2014 this is your day off","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Evening Tasks","\uD83D\uDCF1",C.admin,"Light work from your phone.",evT),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Sleep quality drives everything else.",wiT),
 ],
 Fri:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Consistent start.",mT),
-  b("8:30 \u2013 10:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"End of the week \u2014 cap it off strong.",[t("Economics — one module or reading","WGU"),t("If PA/assessment pending \u2192 use this block to finish it","WGU")]),
-  b("10:00 \u2013 10:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 review.",[t("Block 5: review or practice questions","NASM"),t("Note weak areas in exercise technique","NASM")]),
-  b("10:45 AM \u2013 12:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
-  b("12:00 \u2013 12:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
-  b("12:30 \u2013 12:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"End the week with a clean queue.",eT),
-  b("12:55 \u2013 1:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
-  b("1:25 \u2013 3:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Start the weekend early.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
-  b("3:00 \u2013 4:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Friday workout \u2014 strong close to the training week.",woT),
-  b("4:30 \u2013 5:30 PM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Friday walk \u2014 decompress into the weekend.",waT),
+  b("8:30 \u2013 9:30 AM","Morning Walk","\uD83D\uDEB6",C.walk,"Cooler temps before the day heats up. Good podcast or WGU lecture audio time.",waT),
+  b("9:30 \u2013 11:00 AM","WGU Study","\uD83D\uDCDA",C.wgu,"End of the week \u2014 cap it off strong.",[t("Economics \u2014 one module or reading","WGU"),t("If assessment pending \u2192 use this block to finish it","WGU")]),
+  b("11:00 \u2013 11:45 AM","NASM Study","\uD83E\uDDE0",C.nasm,"Block 5 review.",[t("Block 5 review or practice questions","NASM"),t("Note weak areas to revisit over the weekend","NASM")]),
+  b("11:45 AM \u2013 1:00 PM","Reforged Business","\uD83C\uDFD7\uFE0F",C.reforged,"Gym Bible or Roadmap \u2014 one section.",rfT()),
+  b("1:00 \u2013 1:30 PM","Lunch Break","\uD83C\uDF7D\uFE0F",C.reset,"Proper break.",[t("Log lunch in MacroFactor","Nutrition"),t("Step outside or decompress","Personal")]),
+  b("1:30 \u2013 1:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"End the week with a clean queue.",eT),
+  b("1:55 \u2013 2:25 PM","Household (daily)","\uD83C\uDFE0",C.house,"Quick maintenance.",hoT),
+  b("2:25 \u2013 4:00 PM","Free Time / Personal","\uD83C\uDFAF",C.personal,"Start the weekend early.",[t("Rest, hobby, or anything you want","Personal"),t("Family time if they're home","Personal")]),
+  b("4:00 \u2013 5:30 PM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Friday workout \u2014 strong close to the training week.",woT),
   b("5:30 \u2013 6:30 PM","Personal / Family","\u2600\uFE0F",C.personal,"Start the weekend early.",[t("Family time or personal rest","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Friday Evening","\uD83D\uDCF1",C.personal,"Lighter Friday evening.",[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / personal decompression","Personal")]),
@@ -288,12 +318,12 @@ Fri:[
 ],
 Sat:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Weekend \u2014 still hit the scale.",mT),
-  b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block.",[t("Economics — module or PA draft","WGU"),t("NASM Block 5 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
-  b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout.",woT),
-  b("11:30 AM \u2013 12:05 PM","Run (flexible)","\uD83C\uDFC3",C.run,"Saturday run \u2014 flexible, go longer if you want.",ruT),
-  b("12:05 \u2013 12:30 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
-  b("12:30 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
-  b("3:00 \u2013 4:00 PM","Reforged Business \ud83c\udfa5","\ud83c\udfd7\ufe0f",C.reforged,"THIS WEEK: YouTube origin story filming window. Film here if not done yet.",[t("PRIORITY THIS WEEK: Film YouTube origin story sections","Reforged"),t("Gym visits this week \u2014 review visit log before going","Reforged"),t("Social content planning or drafting","Reforged"),t("Weekly transformation log update","Reforged")]),
+  b("8:30 \u2013 10:00 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Weekend study block.",[t("Economics \u2014 module or assessment draft","WGU"),t("NASM Block 5 review or flashcards","NASM"),t("Practice scenario questions","NASM")]),
+  b("10:00 \u2013 11:30 AM","Workout (1.5 hrs)","\uD83C\uDFCB\uFE0F",C.workout,"Saturday workout. THIS WEEK: film YouTube origin story sections if not done.",woT),
+  b("11:30 AM \u2013 12:10 PM","Run + Content \ud83d\udcf8","\uD83C\uDFC3",C.run,"POST DAY \u2014 capture running photo or clip for Sat post. Publish after the run.",[t("Run \u2014 flexible distance","Run"),t("Capture photo or clip for Sat post \ud83d\udcf8","Reforged"),t("Post to @reforgedfit right after run","Reforged"),t("Log in Apple Health / MacroFactor","Fitness")]),
+  b("12:10 \u2013 12:35 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Quick listing session before errands.",eT),
+  b("12:35 \u2013 3:00 PM","Errands & Groceries","\uD83D\uDED7",C.house,"Saturday errand day.",[t("Grocery shopping","Home"),t("Household supplies / misc errands","Home"),t("Any other weekly errands","Home")]),
+  b("3:00 \u2013 4:00 PM","Reforged Business \ud83c\udfa5","\uD83C\uDFD7\uFE0F",C.reforged,"THIS WEEK: YouTube origin story filming. Gym visits this week.",[t("PRIORITY THIS WEEK: Film YouTube origin story if not done","Reforged"),t("Gym visits this week \u2014 review visit log","Reforged"),t("Social content drafting or scheduling","Reforged"),t("Weekly transformation log update","Reforged")]),
   b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
   b("6:30 \u2013 8:00 PM","Family Dinner","\uD83C\uDF74",C.dinner,"Protected family time.",diT),
   b("8:00 \u2013 9:00 PM","Saturday Evening","\uD83D\uDCF1",C.personal,null,[t("Dishes / kitchen cleanup","Home"),t("eBay check if needed (phone)","eBay"),t("Family time / relax","Personal")]),
@@ -301,37 +331,16 @@ Sat:[
 ],
 Sun:[
   b("8:00 \u2013 8:30 AM","Morning Routine","\uD83C\uDF05",C.morning,"Rest day \u2014 still hit the scale.",mT),
-  b("8:30 \u2013 9:30 AM","Morning Walk","\ud83d\udeb6",C.walk,"Morning walk \u2014 cooler temps before the day heats up. Good WGU lecture audio time.",[t("1 hour walk","Walk"),t("Log steps in Apple Health","Fitness"),t("WGU lecture audio or NASM review (headphones)","WGU")]),
-  b("9:30 \u2013 11:30 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Longest study block of the week.",[t("Economics — full module or assessment","WGU"),t("NASM Block 5 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
-  b("10:30 \u2013 11:15 AM","Walk (1 hr)","\uD83D\uDEB6",C.walk,"Sunday walk \u2014 mental reset before the week ahead.",waT),
-  b("11:15 AM \u2013 2:30 PM","Laundry + Yardwork","\uD83C\uDFE1",C.house,"Primary home day. Laundry runs while you do the yard.",[t("Start laundry \u2014 first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
-  b("2:30 \u2013 2:55 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Weekly listing session.",eT),
-  b("2:55 \u2013 4:00 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week.",[t("Weekly review \u2014 Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
-  b("4:00 \u2013 6:30 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
-  b("6:00 \u2013 9:00 PM","D&D Campaign \ud83c\udfb2","\ud83c\udfb2",C.dnd,"Weekly D&D campaign \u2014 dinner happens during this block. Present and engaged.",[t("D&D session \u2014 show up ready","DnD"),t("Dinner during this block \u2014 no separate dinner needed","DnD")]),
+  b("8:30 \u2013 9:30 AM","Morning Walk","\uD83D\uDEB6",C.walk,"Cooler temps. Good WGU lecture audio or NASM review time.",waT),
+  b("9:30 \u2013 11:30 AM","WGU + NASM Study","\uD83D\uDCDA",C.wgu,"Longest study block of the week.",[t("Economics \u2014 full module or assessment","WGU"),t("NASM Block 5 deep review or full practice test","NASM"),t("Note weak areas to prioritize next week","NASM")]),
+  b("11:30 AM \u2013 2:00 PM","Laundry + Yardwork","\uD83C\uDFE1",C.house,"Primary home day. Run laundry while you do the yard.",[t("Start laundry \u2014 first load","Home"),t("Mowing, edging, or seasonal yardwork","Home"),t("Switch / fold laundry between yard tasks","Home"),t("Any remaining indoor cleaning","Home"),t("Final laundry put away","Home")]),
+  b("2:00 \u2013 2:25 PM","eBay \u2014 List 5 Items","\uD83D\uDED2",C.ebay,"Weekly listing session.",eT),
+  b("2:25 \u2013 3:30 PM","Reforged Weekly Review","\uD83C\uDFD7\uFE0F",C.reforged,"Set direction for the week.",[t("Weekly review \u2014 Gym Bible / Roadmap progress","Reforged"),t("Set top 3 Reforged priorities for the week","Reforged"),t("Transformation photo or check-in if due","Reforged"),t("Set WGU + NASM goals for the week","Admin")]),
+  b("3:30 \u2013 6:00 PM","Personal / Family Time","\u2600\uFE0F",C.personal,"Protected Sunday afternoon.",[t("Unstructured family time","Personal"),t("Rest, hobby, or anything you want","Personal")]),
+  b("6:00 \u2013 9:00 PM","D&D Campaign \ud83c\udfb2","\ud83c\udfb2",C.dnd,"Weekly D&D campaign \u2014 dinner happens during this block.",[t("D&D session \u2014 show up ready","DnD"),t("Dinner during this block","DnD")]),
   b("9:00 \u2013 9:30 PM","Wind Down","\uD83C\uDF19",C.wind,"Good sleep Sunday sets the tone for the whole week.",wiT),
 ],
 };
-
-// ─── localStorage persistence ───────────────────────────────────────────────
-function getTodayKey(){
-  const d=new Date();
-  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-}
-function loadChecked(){
-  try{
-    const s=localStorage.getItem("reforged_checked");
-    if(!s) return {};
-    const p=JSON.parse(s);
-    if(p._date!==getTodayKey()){localStorage.removeItem("reforged_checked");return {};}
-    return p.data||{};
-  }catch(e){return {};}
-}
-function saveChecked(){
-  try{localStorage.setItem("reforged_checked",JSON.stringify({_date:getTodayKey(),data:checked}));}catch(e){}
-}
-
-// ─── State ──────────────────────────────────────────────────────────────────
 const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const todayStr=dayNames[new Date().getDay()];
 let mode="work";
